@@ -93,18 +93,6 @@ Example interactions / Exemples / أمثلة:
 
 "Generate SQL analysis" → future AI response
 
-Project Structure / Structure du projet / هيكل المشروع
-
-ai-data-copilot
-│
-├── core          # AI Brain & router logic / Logique cerveau IA
-├── ingestion     # File loaders (CSV, TXT, PDF) / Chargeurs de fichiers
-├── engines       # DuckDB & Spark engines / Moteurs DuckDB & Spark
-├── pipelines     # Future dbt / Spark pipeline generation / Génération pipelines future
-├── webapp        # Streamlit app / Application Streamlit
-├── data          # Sample datasets / Données exemples
-└── models        # AI models & configs / Modèles IA et configurations
-
 Future Steps / Étapes futures / الخطوات المستقبلية
 
 - Connect AI Copilot to answer questions / Connecter le Copilote IA / توصيل المساعد للرد على الأسئلة
