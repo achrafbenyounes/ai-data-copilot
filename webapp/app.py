@@ -846,8 +846,33 @@ def process_file(f):
     file_tag(ft, t["file_detected"])
     if ft == "csv":
         df = read_csv(f)
-        sec("📋", t["prev_csv"])
-        st.dataframe(df, use_container_width=True, height=240)
+
+        # ── Aperçu collapsible ─────────────────────────────────────
+        with st.expander(f"📋 {t['prev_csv']}", expanded=True):
+            st.dataframe(df, use_container_width=True, height=240)
+
+        # ── Q&A — juste sous l'aperçu ─────────────────────────────
+        sec("💬", t["ask"])
+        user_q = st.text_input(
+            label="q",
+            placeholder=t["ask_hint"],
+            label_visibility="collapsed",
+            key="csv_user_q",
+        )
+        if user_q and user_q.strip():
+            f.seek(0)
+            ctx = extract_file_content(f)
+            prompt = (
+                f"You are an AI data assistant.\n"
+                f"File content:\n{ctx}\n\n"
+                f"IMPORTANT: Answer ONLY in {detect_lang_of_text(user_q)} language.\n"
+                f"Question: {user_q}"
+            )
+            with st.spinner(t["spinner"]):
+                answer = query_ai(prompt)
+            with st.expander(f"🧠 {t['answer']}", expanded=True):
+                st.markdown(f'<div class="ai-bubble">{answer}</div>', unsafe_allow_html=True)
+
         return df
     elif ft == "txt":
         text = read_txt(f)
@@ -873,7 +898,7 @@ def detect_lang_of_text(text):
 # ───────────────────────────────────────────────────────
 def render_health_score(df: pd.DataFrame):
     """Calcule et affiche la carte Data Health Score."""
-    health  = compute_health_score(df, lang=lang)   # ← lang transmis pour i18n
+    health  = compute_health_score(df, lang=lang)
     score   = health["score"]
     niveau  = health["niveau"]
     emoji   = health["emoji"]
@@ -1091,58 +1116,28 @@ if uploaded_file:
         with st.expander(f"🔍 {t['full_report']}"):
             st.json(analysis)
 
-        # ── Transformations ───────────────────────────────────────
-        sec("🔧", t["transforms"])
-        st.markdown(
-            f'<p style="font-size:.79rem;color:#1e293b;margin:-.4rem 0 1.3rem 0;">'
-            f'{t["tr_hint"]}</p>',
-            unsafe_allow_html=True,
-        )
+        # ── Transformations (collapsible) ─────────────────────────
+        with st.expander(f"🔧 {t['transforms']}", expanded=True):
+            st.markdown(
+                f'<p style="font-size:.79rem;color:#1e293b;margin:-.4rem 0 1.3rem 0;">'
+                f'{t["tr_hint"]}</p>',
+                unsafe_allow_html=True,
+            )
 
-        suggestions = generate_transformations(transformed, engine, lang=lang)
-        code_lang   = "sql" if engine == "duckdb" else "python"
+            suggestions = generate_transformations(transformed, engine, lang=lang)
+            code_lang   = "sql" if engine == "duckdb" else "python"
 
-        if not suggestions:
-            st.success(f"✅ {t['no_tr']}")
-        else:
-            for item in suggestions:
-                st.markdown(
-                    f'<div class="tc">'
-                    f'<div class="t-label">{item["label"]}</div>'
-                    f'<div class="t-why">{t["why"]} &nbsp;{item["description"]}</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-                st.code(item["code"], language=code_lang)
+            if not suggestions:
+                st.success(f"✅ {t['no_tr']}")
+            else:
+                for item in suggestions:
+                    st.markdown(
+                        f'<div class="tc">'
+                        f'<div class="t-label">{item["label"]}</div>'
+                        f'<div class="t-why">{t["why"]} &nbsp;{item["description"]}</div>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                    st.code(item["code"], language=code_lang)
 
-    # ── AI Q&A ────────────────────────────────────────────────────
-    st.markdown(
-        '<div style="height:1px;background:linear-gradient(90deg,transparent,'
-        'rgba(255,255,255,0.05),transparent);margin:3rem 0 2.5rem 0;"></div>',
-        unsafe_allow_html=True,
-    )
-    sec("💬", t["ask"])
-
-    user_q = st.text_input(
-        label="q",
-        placeholder=t["ask_hint"],
-        label_visibility="collapsed",
-    )
-
-    if user_q and user_q.strip():
-        uploaded_file.seek(0)
-        ctx  = extract_file_content(uploaded_file)
-        dlng = detect_lang_of_text(user_q)
-
-        prompt = (
-            f"You are an AI data assistant.\n"
-            f"File content:\n{ctx}\n\n"
-            f"IMPORTANT: Answer ONLY in {user_q}.\n"
-            f"Question: {user_q}"
-        )
-
-        with st.spinner(t["spinner"]):
-            answer = query_ai(prompt)
-
-        sec("🧠", t["answer"])
-        st.markdown(f'<div class="ai-bubble">{answer}</div>', unsafe_allow_html=True)
+    # ── (Q&A déplacé sous l'aperçu du dataset dans process_file) ──
