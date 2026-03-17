@@ -375,7 +375,7 @@ button[kind="header"],
 
 /* ═══ HERO ══════════════════════════════════════════════════ */
 .hero-wrap {{
-    padding: 5rem 0 3rem 0;
+    padding: 3rem 0 1.8rem 0;
     position: relative;
 }}
 .hero-badge {{
@@ -391,7 +391,7 @@ button[kind="header"],
     border: 1px solid {A}44;
     border-radius: 50px;
     padding: 0.3rem 1.1rem;
-    margin-bottom: 2.2rem;
+    margin-bottom: 1.4rem;
 }}
 .badge-dot {{
     width: 5px; height: 5px;
@@ -406,7 +406,7 @@ button[kind="header"],
     font-weight: 800 !important;
     line-height: 1.06 !important;
     letter-spacing: -3px !important;
-    margin-bottom: 1.6rem !important;
+    margin-bottom: 1rem !important;
     background: {HERO_GRAD} !important;
     background-size: 300% 300% !important;
     -webkit-background-clip: text !important;
@@ -437,8 +437,8 @@ button[kind="header"],
     font-size: 0.74rem;
     color: {TXT_GHOST};
     font-weight: 500;
-    margin-top: 1.8rem;
-    padding-top: 1.6rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
     border-top: 1px solid {BDR};
 }}
 .author-star {{ color: {A}; }}
@@ -450,6 +450,93 @@ button[kind="header"],
     font-weight: 700;
     font-size: 0.82rem;
     font-family: 'Syne', sans-serif;
+}}
+.contact-row {{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid {BDR};
+}}
+.contact-chip {{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: {TXT_MUTED};
+    background: {CARD};
+    border: 1px solid {BDR};
+    border-radius: 50px;
+    padding: 0.3rem 0.9rem;
+    text-decoration: none;
+    font-family: 'Outfit', sans-serif;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(.4,0,.2,1);
+}}
+.contact-chip:hover {{
+    border-color: {A}77;
+    color: {A};
+    box-shadow: 0 0 0 3px {GLW};
+    text-decoration: none;
+    transform: translateY(-1px);
+}}
+.ci-svg {{
+    width: 13px; height: 13px;
+    flex-shrink: 0;
+    opacity: 0.75;
+}}
+.linkedin-btn {{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+    border: none;
+    border-radius: 50px;
+    padding: 0.42rem 1.1rem 0.42rem 0.75rem;
+    text-decoration: none;
+    font-family: 'Outfit', sans-serif;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 2px 12px rgba(0,119,181,0.35), 0 0 0 0 rgba(0,119,181,0);
+}}
+.linkedin-btn::before {{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+    border-radius: 50px;
+    pointer-events: none;
+}}
+.linkedin-btn:hover {{
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 24px rgba(0,119,181,0.55), 0 0 0 4px rgba(0,119,181,0.12);
+    text-decoration: none;
+    color: #fff;
+}}
+.linkedin-btn:active {{
+    transform: scale(0.97);
+}}
+.li-icon {{
+    width: 15px; height: 15px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}}
+.li-arrow {{
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-left: 0.1rem;
+    transition: transform 0.18s ease;
+}}
+.linkedin-btn:hover .li-arrow {{
+    transform: translate(2px, -2px);
 }}
 
 /* ═══ CUSTOMIZER PANEL ══════════════════════════════════════ */
@@ -529,7 +616,7 @@ button[kind="header"],
     letter-spacing: 3px;
     text-transform: uppercase;
     color: {TXT_MUTED};
-    margin: 2.8rem 0 1.3rem 0;
+    margin: 1.8rem 0 0.9rem 0;
 }}
 .sec-row::after {{
     content: '';
@@ -575,7 +662,7 @@ button[kind="header"],
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.2rem;
-    margin: 0.8rem 0 2rem 0;
+    margin: 0.6rem 0 1.4rem 0;
 }}
 .mtile {{
     background: {CARD};
@@ -632,7 +719,7 @@ button[kind="header"],
     border: 1px solid {BDR};
     border-radius: 20px;
     padding: 1.6rem 2rem;
-    margin: 0 0 2rem 0;
+    margin: 0 0 1.4rem 0;
     backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
@@ -1052,6 +1139,21 @@ st.markdown(f"""
         <span style="color:#1e293b;font-size:.74rem;">{t['author'].replace('Achraf BEN YOUNES','').replace('أشرف بن يونس','').strip()}</span>
         <span class="author-name">Achraf BEN YOUNES</span>
     </div>
+    <div class="contact-row">
+        <span class="contact-chip">
+            <svg class="ci-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span>achrafbenyounes2012@gmail.com</span>
+        </span>
+        <span class="contact-chip">
+            <svg class="ci-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>07.60.93.53.71</span>
+        </span>
+        <a class="linkedin-btn" href="https://www.linkedin.com/in/achraf-b-601b7012/" target="_blank" rel="noopener noreferrer">
+            <svg class="li-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            <span>LinkedIn</span>
+            <span class="li-arrow">↗</span>
+        </a>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1105,14 +1207,6 @@ if uploaded_file:
         df=content if isinstance(content, pd.DataFrame) else None,
     )
 
-    st.markdown(
-        f'<div class="engine-badge">'
-        f'<div class="e-pulse"></div>'
-        f'{t["engine_label"]} &nbsp;· &nbsp;<strong>{engine}</strong>'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
-
     if isinstance(transformed, pd.DataFrame):
 
         # ── Metrics ───────────────────────────────────────────────
@@ -1143,7 +1237,7 @@ if uploaded_file:
             st.json(analysis)
 
         # ── Transformations (collapsible) ─────────────────────────
-        with st.expander(f"🔧 {t['transforms']}", expanded=True):
+        with st.expander(f"🔧 {t['transforms']}", expanded=False):
             st.markdown(
                 f'<p style="font-size:.79rem;color:#1e293b;margin:-.4rem 0 1.3rem 0;">'
                 f'{t["tr_hint"]}</p>',
