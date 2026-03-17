@@ -160,7 +160,7 @@ T = {
 # ───────────────────────────────────────────────────────
 if "lang"  not in st.session_state: st.session_state.lang  = "fr"
 if "theme" not in st.session_state: st.session_state.theme = "Ocean"
-if "bg"    not in st.session_state: st.session_state.bg    = "Void"
+if "bg"    not in st.session_state: st.session_state.bg    = "Pearl"
 
 lang  = st.session_state.lang
 theme = st.session_state.theme
@@ -439,7 +439,7 @@ button[kind="header"],
     font-weight: 500;
     margin-top: 1.8rem;
     padding-top: 1.6rem;
-    border-top: 1px solid rgba(255,255,255,0.04);
+    border-top: 1px solid {BDR};
 }}
 .author-star {{ color: {A}; }}
 .author-name {{
@@ -472,15 +472,16 @@ button[kind="header"],
 
 /* ═══ FILE UPLOADER ═════════════════════════════════════════ */
 [data-testid="stFileUploader"] {{
-    background: rgba(10,14,23,0.7) !important;
-    border: 1px dashed {A}44 !important;
+    background: {CARD} !important;
+    border: 1px dashed {A}55 !important;
     border-radius: 18px !important;
     transition: border-color 0.25s, background 0.25s !important;
     padding: 0.5rem !important;
 }}
 [data-testid="stFileUploader"]:hover {{
     border-color: {A}99 !important;
-    background: rgba(10,14,23,0.9) !important;
+    background: {CARD} !important;
+    box-shadow: 0 0 0 4px {GLW} !important;
 }}
 [data-testid="stFileUploaderDropzone"] {{
     background: transparent !important;
@@ -488,6 +489,31 @@ button[kind="header"],
 }}
 [data-testid="stFileUploaderDropzoneInstructions"] {{
     color: {TXT_MUTED} !important;
+}}
+[data-testid="stFileUploaderDropzoneInstructions"] span,
+[data-testid="stFileUploaderDropzoneInstructions"] small,
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] span,
+[data-testid="stFileUploader"] p {{
+    color: {TXT_MUTED} !important;
+}}
+[data-testid="stFileUploader"] svg {{
+    fill: {A} !important;
+    color: {A} !important;
+}}
+[data-testid="stFileUploader"] button {{
+    background: {CARD} !important;
+    color: {TXT_MAIN} !important;
+    border: 1px solid {BDR} !important;
+    border-radius: 10px !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}}
+[data-testid="stFileUploader"] button:hover {{
+    border-color: {A}88 !important;
+    color: {A} !important;
+    box-shadow: 0 0 0 3px {GLW} !important;
 }}
 [data-testid="stFileUploader"] > div > div:first-child {{
     display: none !important;
