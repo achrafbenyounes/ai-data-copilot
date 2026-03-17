@@ -1,11 +1,13 @@
 import pandas as pd
 import duckdb
-from pyspark.sql import SparkSession
 
 def choose_engine(source_type: str, file_size_mb: float, df: pd.DataFrame = None):
     """
-    Chooses the best engine and executes optional transformations
-    Returns engine name and possibly transformed dataframe
+    Chooses the best engine and executes optional transformations.
+    Returns engine name and possibly transformed dataframe.
+
+    Note : PySpark est désactivé en production cloud (Streamlit Cloud ne supporte pas Java).
+    Pour des fichiers > 500MB, le moteur reste DuckDB.
     """
 
     engine = None
@@ -28,14 +30,14 @@ def choose_engine(source_type: str, file_size_mb: float, df: pd.DataFrame = None
     # -----------------------
     if df is not None:
         if engine == "duckdb":
-            # DuckDB in-memory execution
             con = duckdb.connect(database=':memory:')
             con.register('dataset', df)
-            # Example: simple query to test engine
             transformed_df = con.execute("SELECT * FROM dataset").df()
         elif engine.startswith("spark"):
-            # Spark session execution
-            spark = SparkSession.builder.master("local[*]").appName("AIDataCopilot").getOrCreate()
-            transformed_df = spark.createDataFrame(df)
+            # Spark non disponible en cloud — fallback sur DuckDB
+            engine = "duckdb"
+            con = duckdb.connect(database=':memory:')
+            con.register('dataset', df)
+            transformed_df = con.execute("SELECT * FROM dataset").df()
 
     return engine, transformed_df

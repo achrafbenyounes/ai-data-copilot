@@ -1,7 +1,13 @@
-# ai_brain.py
 import requests
+import streamlit as st
 
-GROQ_API_KEY = "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"
+# ─── Clé API sécurisée via Streamlit Secrets ───────────────────
+# En local : créer .streamlit/secrets.toml avec GROQ_API_KEY = "gsk_..."
+# En production : ajouter la clé dans Settings > Secrets sur share.streamlit.io
+try:
+    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+except Exception:
+    GROQ_API_KEY = ""
 
 SYSTEM_PROMPT = """You are a senior data analyst. Always reply in the same language as the user's question.
                 Instructions:
@@ -12,6 +18,9 @@ SYSTEM_PROMPT = """You are a senior data analyst. Always reply in the same langu
                 """
 
 def query_ai(prompt: str, timeout: int = 300) -> str:
+    if not GROQ_API_KEY:
+        return "Erreur : clé API Groq manquante. Configurez GROQ_API_KEY dans les Secrets Streamlit."
+
     try:
         response = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
@@ -20,7 +29,7 @@ def query_ai(prompt: str, timeout: int = 300) -> str:
                 "Content-Type": "application/json"
             },
             json={
-                "model": "llama-3.1-8b-instant",  # FIX: nouveau nom du modèle
+                "model": "llama-3.1-8b-instant",
                 "messages": [
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
