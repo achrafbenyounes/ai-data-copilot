@@ -227,6 +227,50 @@ _T = {
 _SUPPORTED_LANGS = {"fr", "en", "es", "de", "ar"}
 _DEFAULT_LANG    = "fr"
 
+# Labels for the per-column breakdown tables appended to penalty details
+_EXTRA_LABELS = {
+    "fr": {
+        "col":          "Colonne",
+        "missing":      "Cases vides",
+        "pct":          "% vide",
+        "top_missing":  "Colonnes les plus incomplètes",
+        "affected":     "Colonnes concernées",
+        "of_rows":      "sur {n} lignes",
+    },
+    "en": {
+        "col":          "Column",
+        "missing":      "Missing",
+        "pct":          "% empty",
+        "top_missing":  "Most incomplete columns",
+        "affected":     "Affected columns",
+        "of_rows":      "out of {n} rows",
+    },
+    "es": {
+        "col":          "Columna",
+        "missing":      "Vacíos",
+        "pct":          "% vacío",
+        "top_missing":  "Columnas más incompletas",
+        "affected":     "Columnas afectadas",
+        "of_rows":      "de {n} filas",
+    },
+    "de": {
+        "col":          "Spalte",
+        "missing":      "Fehlend",
+        "pct":          "% leer",
+        "top_missing":  "Unvollständigste Spalten",
+        "affected":     "Betroffene Spalten",
+        "of_rows":      "von {n} Zeilen",
+    },
+    "ar": {
+        "col":          "العمود",
+        "missing":      "الفارغة",
+        "pct":          "% فارغ",
+        "top_missing":  "أكثر الأعمدة نقصاً",
+        "affected":     "الأعمدة المتأثرة",
+        "of_rows":      "من {n} صف",
+    },
+}
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # HELPERS
@@ -344,9 +388,21 @@ def compute_health_score(df: pd.DataFrame, lang: str = "fr") -> dict:
             msg = _t("missing_values", lang,
                      total_nulls=total_nulls,
                      null_pct=round(null_pct * 100, 1))
+            # Per-column breakdown (top 5 most incomplete columns)
+            el = _EXTRA_LABELS.get(lang, _EXTRA_LABELS["fr"])
+            null_by_col = df.isnull().sum().sort_values(ascending=False)
+            null_by_col = null_by_col[null_by_col > 0].head(5)
+            extra_rows = [
+                {"col": c, "vides": int(v), "pct": round(v / len(df) * 100, 1)}
+                for c, v in null_by_col.items()
+            ]
             details.append({"critere": msg["label"], "penalite": null_penalty,
                              "explication": msg["explication"],
-                             "impact": msg["impact"], "conseil": msg["conseil"]})
+                             "impact": msg["impact"], "conseil": msg["conseil"],
+                             "extra_rows": extra_rows,
+                             "extra_header": el["top_missing"],
+                             "extra_of_rows": el["of_rows"].format(n=len(df)),
+                             "extra_col_headers": [el["col"], el["missing"], el["pct"]]})
 
     # ── 2. Doublons (jusqu'à -20 pts) ───────────────────────────────
     dup_count = int(df.duplicated().sum())
@@ -371,9 +427,18 @@ def compute_health_score(df: pd.DataFrame, lang: str = "fr") -> dict:
         )
         msg = _t("empty_columns", lang,
                  nb_cols=len(high_null_cols), col_names=readable_cols)
+        el = _EXTRA_LABELS.get(lang, _EXTRA_LABELS["fr"])
+        extra_rows = [
+            {"col": c, "vides": int(df[c].isnull().sum()), "pct": round(df[c].isnull().mean() * 100, 1)}
+            for c in high_null_cols
+        ]
         details.append({"critere": msg["label"], "penalite": cols_penalty,
                          "explication": msg["explication"],
-                         "impact": msg["impact"], "conseil": msg["conseil"]})
+                         "impact": msg["impact"], "conseil": msg["conseil"],
+                         "extra_rows": extra_rows,
+                         "extra_header": el["affected"],
+                         "extra_of_rows": el["of_rows"].format(n=len(df)),
+                         "extra_col_headers": [el["col"], el["missing"], el["pct"]]})
 
     # ── 4. Outliers intelligents (jusqu'à -25 pts) ───────────────────
     numeric_cols    = df.select_dtypes(include=["int64", "float64"]).columns

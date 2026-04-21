@@ -1083,26 +1083,96 @@ def render_health_score(df: pd.DataFrame):
     # ── Détail des pénalités ──────────────────────────────────
     if details:
         with st.expander(f"🔍 {t['health_detail']}"):
-            for d in details:
+            for idx, d in enumerate(details):
+                # Build the optional per-column breakdown table
+                extra_html = ""
+                if d.get("extra_rows"):
+                    rows_html = ""
+                    for row in d["extra_rows"]:
+                        bar_pct = min(row["pct"], 100)
+                        rows_html += f"""
+                        <tr>
+                            <td style="padding:5px 8px;font-size:0.78rem;color:{TXT_MAIN};
+                                       border-bottom:1px solid rgba(128,128,128,0.1);
+                                       max-width:160px;word-break:break-word;">
+                                {row['col']}
+                            </td>
+                            <td style="padding:5px 8px;font-size:0.78rem;color:{TXT_MUTED};
+                                       text-align:right;white-space:nowrap;
+                                       border-bottom:1px solid rgba(128,128,128,0.1);">
+                                {row['vides']:,}&nbsp;<span style="opacity:0.6;font-size:0.72rem;">{d['extra_of_rows']}</span>
+                            </td>
+                            <td style="padding:5px 8px;border-bottom:1px solid rgba(128,128,128,0.1);
+                                       min-width:110px;">
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <div style="flex:1;background:rgba(128,128,128,0.15);
+                                                border-radius:3px;height:6px;overflow:hidden;">
+                                        <div style="width:{bar_pct}%;background:{text_color};
+                                                    border-radius:3px;height:6px;"></div>
+                                    </div>
+                                    <span style="font-size:0.75rem;color:{text_color};
+                                                 min-width:40px;text-align:right;font-weight:600;">
+                                        {row['pct']} %
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>"""
+                    ch = d["extra_col_headers"]
+                    extra_html = f"""
+                    <div style="margin-top:0.9rem;padding:0.65rem 0.75rem;
+                                background:rgba(128,128,128,0.05);border-radius:8px;
+                                border:1px solid rgba(128,128,128,0.12);">
+                        <div style="font-size:0.72rem;font-weight:700;color:{TXT_MUTED};
+                                    text-transform:uppercase;letter-spacing:0.06em;
+                                    margin-bottom:0.5rem;">
+                            📊&nbsp;{d['extra_header']}
+                        </div>
+                        <table style="width:100%;border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="padding:4px 8px;font-size:0.7rem;font-weight:600;
+                                               color:{TXT_MUTED};text-align:left;
+                                               border-bottom:1px solid rgba(128,128,128,0.18);">
+                                        {ch[0]}
+                                    </th>
+                                    <th style="padding:4px 8px;font-size:0.7rem;font-weight:600;
+                                               color:{TXT_MUTED};text-align:right;
+                                               border-bottom:1px solid rgba(128,128,128,0.18);">
+                                        {ch[1]}
+                                    </th>
+                                    <th style="padding:4px 8px;font-size:0.7rem;font-weight:600;
+                                               color:{TXT_MUTED};
+                                               border-bottom:1px solid rgba(128,128,128,0.18);">
+                                        {ch[2]}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>{rows_html}</tbody>
+                        </table>
+                    </div>"""
+
+                divider = "" if idx == 0 else f'<div style="border-top:1px solid rgba(128,128,128,0.12);margin:0.75rem 0;"></div>'
                 st.markdown(f"""
+                {divider}
                 <div class="health-penalty-item">
                     <span class="health-penalty-badge"
                           style="background:{badge_bg}; border:1px solid {badge_border}; color:{text_color};">
                         −{d['penalite']} pts
                     </span>
                     <div style="flex:1;">
-                        <div style="font-size:0.85rem;font-weight:600;color:{TXT_MAIN};margin-bottom:0.5rem;">
+                        <div style="font-size:0.85rem;font-weight:600;color:{TXT_MAIN};margin-bottom:0.55rem;">
                             {d['critere']}
                         </div>
-                        <div class="health-penalty-text" style="margin-bottom:0.35rem;">
+                        <div class="health-penalty-text" style="margin-bottom:0.4rem;">
                             📋&nbsp;{d['explication']}
                         </div>
-                        <div class="health-penalty-text" style="margin-bottom:0.35rem;">
+                        <div class="health-penalty-text" style="margin-bottom:0.4rem;">
                             ⚠️&nbsp;{d['impact']}
                         </div>
                         <div class="health-penalty-text">
                             ✅&nbsp;{d['conseil']}
                         </div>
+                        {extra_html}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
