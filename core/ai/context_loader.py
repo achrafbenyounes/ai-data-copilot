@@ -14,8 +14,25 @@ def extract_file_content(uploaded_file) -> str:
     uploaded_file.seek(0)
 
     if file_type == "csv":
-        df = pd.read_csv(uploaded_file, nrows=50)  # first 50 rows only for context
-        return df.to_string(index=False)
+        encodings  = ["utf-8-sig", "utf-8", "latin-1", "cp1252"]
+        separators = [";", ",", "\t", "|"]
+        best = None
+        for enc in encodings:
+            for sep in separators:
+                try:
+                    uploaded_file.seek(0)
+                    df = pd.read_csv(uploaded_file, encoding=enc, sep=sep,
+                                     engine="python", on_bad_lines="skip", nrows=50)
+                    if df.shape[1] > 1:
+                        if best is None or df.shape[1] > best.shape[1]:
+                            best = df
+                except Exception:
+                    pass
+        if best is None:
+            uploaded_file.seek(0)
+            best = pd.read_csv(uploaded_file, encoding="utf-8-sig",
+                               on_bad_lines="skip", nrows=50)
+        return best.to_string(index=False)
 
     elif file_type == "txt":
         return uploaded_file.read().decode("utf-8")[:5000]  # limit to 5000 chars
