@@ -9,7 +9,12 @@ try:
 except Exception:
     GROQ_API_KEY = ""
 
-SYSTEM_PROMPT = "You are a senior data analyst. Reply in the same language as the user's question. Be concise and precise."
+SYSTEM_PROMPT = (
+    "You are a senior data analyst. "
+    "CRITICAL RULE: always reply in the exact language the user writes in — "
+    "never switch to another language under any circumstances. "
+    "Be concise and precise."
+)
 
 def query_ai(prompt: str, timeout: int = 300) -> str:
     if not GROQ_API_KEY:

@@ -1029,10 +1029,11 @@ def process_file(f):
         if user_q and user_q.strip():
             f.seek(0)
             ctx = extract_file_content(f)[:4000]   # hard cap — keeps input well under 6 000 TPM
+            user_lang = detect_lang_of_text(user_q)
             prompt = (
                 f"Data sample (first 20 rows):\n{ctx}\n\n"
-                f"Answer in {detect_lang_of_text(user_q)}.\n"
-                f"Question: {user_q}"
+                f"Question: {user_q}\n\n"
+                f"IMPORTANT: your entire response MUST be written in {user_lang} only."
             )
             with st.spinner(t["spinner"]):
                 answer = query_ai(prompt)
@@ -1055,7 +1056,15 @@ def process_file(f):
 
 def detect_lang_of_text(text):
     try:
-        return {"fr":"French","en":"English","ar":"Arabic"}.get(detect(text),"English")
+        code = detect(text)
+        names = {
+            "fr": "French", "en": "English", "ar": "Arabic",
+            "es": "Spanish", "de": "German", "it": "Italian",
+            "pt": "Portuguese", "nl": "Dutch", "ru": "Russian",
+            "zh-cn": "Chinese", "zh-tw": "Chinese", "ja": "Japanese",
+            "ko": "Korean", "tr": "Turkish", "pl": "Polish",
+        }
+        return names.get(code, "English")
     except:
         return "English"
 
