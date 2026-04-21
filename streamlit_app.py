@@ -926,19 +926,27 @@ code, pre {{ font-family: 'JetBrains Mono', monospace !important; font-size: 0.8
 # HELPERS
 # ───────────────────────────────────────────────────────
 def read_csv(f):
-    encodings = ["utf-8", "utf-8-sig", "latin-1", "cp1252"]
-    separators = [",", ";", "\t", "|"]
-    last_err = None
+    encodings = ["utf-8-sig", "utf-8", "latin-1", "cp1252"]
+    separators = [";", ",", "\t", "|"]
+    best = None
     for enc in encodings:
         for sep in separators:
             try:
                 f.seek(0)
                 df = pd.read_csv(f, encoding=enc, sep=sep, engine="python", on_bad_lines="skip")
-                if df.shape[1] > 1 or sep == ",":
-                    return df
-            except Exception as e:
-                last_err = e
-    raise ValueError(f"Could not parse CSV file. Last error: {last_err}")
+                if df.shape[1] > 1:
+                    if best is None or df.shape[1] > best.shape[1]:
+                        best = df
+            except Exception:
+                pass
+    if best is not None:
+        return best
+    # last resort: comma with utf-8-sig, keep whatever we get
+    try:
+        f.seek(0)
+        return pd.read_csv(f, encoding="utf-8-sig", on_bad_lines="skip")
+    except Exception as e:
+        raise ValueError(f"Could not parse CSV file: {e}")
 
 def read_txt(f):
     f.seek(0); return f.read().decode("utf-8")
