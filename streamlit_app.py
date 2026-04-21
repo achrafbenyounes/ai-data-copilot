@@ -84,6 +84,16 @@ T = {
         "health_title":   "Data Health Score",
         "health_detail":  "Détail des pénalités",
         "health_perfect": "Aucune pénalité — données impeccables !",
+        "health_how_title": "Comment le score est calculé",
+        "health_how_intro": "Votre fichier démarre à 100 points. Des points sont déduits automatiquement selon les problèmes détectés :",
+        "health_penalty_cats": [
+            ("❌ Valeurs manquantes",          "jusqu'à −30 pts", "Cases vides dans votre tableau"),
+            ("🔁 Lignes en double",             "jusqu'à −20 pts", "Même ligne répétée plusieurs fois"),
+            ("🕳️ Colonnes quasi-vides",         "jusqu'à −25 pts", "Colonne remplie à moins de 50 %"),
+            ("📐 Valeurs aberrantes",            "jusqu'à −25 pts", "Chiffres anormalement élevés ou bas"),
+        ],
+        "health_breakdown_label": "Détail par colonne",
+        "health_rows_label": "lignes",
     },
     "en": {
         "tagline1":       "Your intelligent copilot for data analysis and transformation.",
@@ -118,6 +128,16 @@ T = {
         "health_title":   "Data Health Score",
         "health_detail":  "Penalty details",
         "health_perfect": "No penalties — data is spotless!",
+        "health_how_title": "How the score is calculated",
+        "health_how_intro": "Your file starts at 100 points. Points are automatically deducted based on the issues found:",
+        "health_penalty_cats": [
+            ("❌ Missing values",               "up to −30 pts", "Empty cells in your table"),
+            ("🔁 Duplicate rows",               "up to −20 pts", "Same row appearing multiple times"),
+            ("🕳️ Nearly empty columns",         "up to −25 pts", "Column less than 50% filled"),
+            ("📐 Outliers",                     "up to −25 pts", "Abnormally high or low numbers"),
+        ],
+        "health_breakdown_label": "Column breakdown",
+        "health_rows_label": "rows",
     },
     "ar": {
         "tagline1":       "مساعدك الذكي لتحليل البيانات وتحويلها.",
@@ -152,6 +172,16 @@ T = {
         "health_title":   "نقاط جودة البيانات",
         "health_detail":  "تفاصيل النقاط المخصومة",
         "health_perfect": "لا توجد خصومات — البيانات ممتازة!",
+        "health_how_title": "كيف يُحسب النقاط",
+        "health_how_intro": "يبدأ ملفك بـ 100 نقطة. يتم خصم نقاط تلقائيًا بناءً على المشكلات المكتشفة:",
+        "health_penalty_cats": [
+            ("❌ قيم مفقودة",                  "حتى −30 نقطة",  "خلايا فارغة في جدولك"),
+            ("🔁 صفوف مكررة",                  "حتى −20 نقطة",  "نفس الصف يظهر أكثر من مرة"),
+            ("🕳️ أعمدة شبه فارغة",             "حتى −25 نقطة",  "عمود مملوء بأقل من 50%"),
+            ("📐 قيم شاذة",                    "حتى −25 نقطة",  "أرقام مرتفعة أو منخفضة بشكل غير طبيعي"),
+        ],
+        "health_breakdown_label": "تفاصيل الأعمدة",
+        "health_rows_label": "صف",
     },
 }
 
@@ -1083,80 +1113,44 @@ def render_health_score(df: pd.DataFrame):
     # ── Détail des pénalités ──────────────────────────────────
     if details:
         with st.expander(f"🔍 {t['health_detail']}"):
-            for idx, d in enumerate(details):
-                # Build the optional per-column breakdown table
-                extra_html = ""
-                if d.get("extra_rows"):
-                    rows_html = ""
-                    for row in d["extra_rows"]:
-                        bar_pct = min(row["pct"], 100)
-                        rows_html += f"""
-                        <tr>
-                            <td style="padding:5px 8px;font-size:0.78rem;color:{TXT_MAIN};
-                                       border-bottom:1px solid rgba(128,128,128,0.1);
-                                       max-width:160px;word-break:break-word;">
-                                {row['col']}
-                            </td>
-                            <td style="padding:5px 8px;font-size:0.78rem;color:{TXT_MUTED};
-                                       text-align:right;white-space:nowrap;
-                                       border-bottom:1px solid rgba(128,128,128,0.1);">
-                                {row['vides']:,}&nbsp;<span style="opacity:0.6;font-size:0.72rem;">{d['extra_of_rows']}</span>
-                            </td>
-                            <td style="padding:5px 8px;border-bottom:1px solid rgba(128,128,128,0.1);
-                                       min-width:110px;">
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <div style="flex:1;background:rgba(128,128,128,0.15);
-                                                border-radius:3px;height:6px;overflow:hidden;">
-                                        <div style="width:{bar_pct}%;background:{text_color};
-                                                    border-radius:3px;height:6px;"></div>
-                                    </div>
-                                    <span style="font-size:0.75rem;color:{text_color};
-                                                 min-width:40px;text-align:right;font-weight:600;">
-                                        {row['pct']} %
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>"""
-                    ch = d["extra_col_headers"]
-                    extra_html = f"""
-                    <div style="margin-top:0.9rem;padding:0.65rem 0.75rem;
-                                background:rgba(128,128,128,0.05);border-radius:8px;
-                                border:1px solid rgba(128,128,128,0.12);">
-                        <div style="font-size:0.72rem;font-weight:700;color:{TXT_MUTED};
-                                    text-transform:uppercase;letter-spacing:0.06em;
-                                    margin-bottom:0.5rem;">
-                            📊&nbsp;{d['extra_header']}
-                        </div>
-                        <table style="width:100%;border-collapse:collapse;">
-                            <thead>
-                                <tr>
-                                    <th style="padding:4px 8px;font-size:0.7rem;font-weight:600;
-                                               color:{TXT_MUTED};text-align:left;
-                                               border-bottom:1px solid rgba(128,128,128,0.18);">
-                                        {ch[0]}
-                                    </th>
-                                    <th style="padding:4px 8px;font-size:0.7rem;font-weight:600;
-                                               color:{TXT_MUTED};text-align:right;
-                                               border-bottom:1px solid rgba(128,128,128,0.18);">
-                                        {ch[1]}
-                                    </th>
-                                    <th style="padding:4px 8px;font-size:0.7rem;font-weight:600;
-                                               color:{TXT_MUTED};
-                                               border-bottom:1px solid rgba(128,128,128,0.18);">
-                                        {ch[2]}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>{rows_html}</tbody>
-                        </table>
-                    </div>"""
 
-                divider = "" if idx == 0 else f'<div style="border-top:1px solid rgba(128,128,128,0.12);margin:0.75rem 0;"></div>'
+            # ── Explication du système de notation ────────────────
+            cats_rows = "".join(
+                f"<tr>"
+                f"<td style='padding:5px 10px;font-size:0.8rem;color:{TXT_MAIN};border-bottom:1px solid rgba(128,128,128,0.08);'>{icon}</td>"
+                f"<td style='padding:5px 10px;font-size:0.75rem;color:{TXT_MUTED};border-bottom:1px solid rgba(128,128,128,0.08);'>{desc}</td>"
+                f"<td style='padding:5px 10px;font-size:0.78rem;font-weight:700;color:{text_color};text-align:right;white-space:nowrap;border-bottom:1px solid rgba(128,128,128,0.08);'>{pts}</td>"
+                f"</tr>"
+                for icon, pts, desc in t["health_penalty_cats"]
+            )
+            st.markdown(f"""
+            <div style="background:rgba(128,128,128,0.05);border:1px solid rgba(128,128,128,0.12);
+                        border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.1rem;">
+                <div style="font-size:0.78rem;font-weight:700;color:{TXT_MAIN};margin-bottom:0.5rem;">
+                    ℹ️&nbsp;{t['health_how_title']}
+                </div>
+                <div style="font-size:0.77rem;color:{TXT_MUTED};margin-bottom:0.65rem;">
+                    {t['health_how_intro']}
+                </div>
+                <table style="width:100%;border-collapse:collapse;">
+                    <tbody>{cats_rows}</tbody>
+                </table>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # ── Liste des pénalités actives ────────────────────────
+            for idx, d in enumerate(details):
+                if idx > 0:
+                    st.markdown(
+                        f"<div style='border-top:1px solid rgba(128,128,128,0.12);margin:0.6rem 0;'></div>",
+                        unsafe_allow_html=True,
+                    )
+
+                # Card: badge + title + 3 explanation lines
                 st.markdown(f"""
-                {divider}
                 <div class="health-penalty-item">
                     <span class="health-penalty-badge"
-                          style="background:{badge_bg}; border:1px solid {badge_border}; color:{text_color};">
+                          style="background:{badge_bg};border:1px solid {badge_border};color:{text_color};">
                         −{d['penalite']} pts
                     </span>
                     <div style="flex:1;">
@@ -1172,10 +1166,24 @@ def render_health_score(df: pd.DataFrame):
                         <div class="health-penalty-text">
                             ✅&nbsp;{d['conseil']}
                         </div>
-                        {extra_html}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
+
+                # Breakdown table — separate st.markdown call to avoid rendering issues
+                if d.get("extra_rows"):
+                    ch = d["extra_col_headers"]
+                    n_rows_label = d.get("extra_of_rows", "")
+                    header_md = f"| {ch[0]} | {ch[1]} | {ch[2]} |"
+                    sep_md    = "|:---|---:|---:|"
+                    rows_md   = "\n".join(
+                        f"| **{r['col']}** | {r['vides']:,} {n_rows_label} | {r['pct']} % |"
+                        for r in d["extra_rows"]
+                    )
+                    st.markdown(
+                        f"**📊 {d['extra_header']}**\n\n"
+                        f"{header_md}\n{sep_md}\n{rows_md}",
+                    )
     else:
         st.success(f"✅ {t['health_perfect']}")
 
