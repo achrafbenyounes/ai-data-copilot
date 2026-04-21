@@ -9,13 +9,7 @@ try:
 except Exception:
     GROQ_API_KEY = ""
 
-SYSTEM_PROMPT = """You are a senior data analyst. Always reply in the same language as the user's question.
-                Instructions:
-                    - analyze the data carefully
-                    - answer clearly
-                    - if the question is about statistics compute insights
-                    - if it is about text summarize it
-                """
+SYSTEM_PROMPT = "You are a senior data analyst. Reply in the same language as the user's question. Be concise and precise."
 
 def query_ai(prompt: str, timeout: int = 300) -> str:
     if not GROQ_API_KEY:
@@ -34,7 +28,7 @@ def query_ai(prompt: str, timeout: int = 300) -> str:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
                 ],
-                "max_tokens": 10000
+                "max_tokens": 1024
             },
             timeout=timeout
         )

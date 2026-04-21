@@ -22,7 +22,7 @@ def extract_file_content(uploaded_file) -> str:
                 try:
                     uploaded_file.seek(0)
                     df = pd.read_csv(uploaded_file, encoding=enc, sep=sep,
-                                     engine="python", on_bad_lines="skip", nrows=50)
+                                     engine="python", on_bad_lines="skip", nrows=20)
                     if df.shape[1] > 1:
                         if best is None or df.shape[1] > best.shape[1]:
                             best = df
@@ -31,8 +31,9 @@ def extract_file_content(uploaded_file) -> str:
         if best is None:
             uploaded_file.seek(0)
             best = pd.read_csv(uploaded_file, encoding="utf-8-sig",
-                               on_bad_lines="skip", nrows=50)
-        return best.to_string(index=False)
+                               on_bad_lines="skip", nrows=20)
+        # Cap output to keep token count within Groq free-tier limits (~4 000 chars ≈ 1 000 tokens)
+        return best.to_string(index=False)[:4000]
 
     elif file_type == "txt":
         return uploaded_file.read().decode("utf-8")[:5000]  # limit to 5000 chars

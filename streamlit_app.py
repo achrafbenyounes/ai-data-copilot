@@ -1028,11 +1028,10 @@ def process_file(f):
         )
         if user_q and user_q.strip():
             f.seek(0)
-            ctx = extract_file_content(f)
+            ctx = extract_file_content(f)[:4000]   # hard cap — keeps input well under 6 000 TPM
             prompt = (
-                f"You are an AI data assistant.\n"
-                f"File content:\n{ctx}\n\n"
-                f"IMPORTANT: Answer ONLY in {detect_lang_of_text(user_q)} language.\n"
+                f"Data sample (first 20 rows):\n{ctx}\n\n"
+                f"Answer in {detect_lang_of_text(user_q)}.\n"
                 f"Question: {user_q}"
             )
             with st.spinner(t["spinner"]):
