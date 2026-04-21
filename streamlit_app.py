@@ -926,7 +926,19 @@ code, pre {{ font-family: 'JetBrains Mono', monospace !important; font-size: 0.8
 # HELPERS
 # ───────────────────────────────────────────────────────
 def read_csv(f):
-    f.seek(0); return pd.read_csv(f)
+    encodings = ["utf-8", "utf-8-sig", "latin-1", "cp1252"]
+    separators = [",", ";", "\t", "|"]
+    last_err = None
+    for enc in encodings:
+        for sep in separators:
+            try:
+                f.seek(0)
+                df = pd.read_csv(f, encoding=enc, sep=sep, engine="python", on_bad_lines="skip")
+                if df.shape[1] > 1 or sep == ",":
+                    return df
+            except Exception as e:
+                last_err = e
+    raise ValueError(f"Could not parse CSV file. Last error: {last_err}")
 
 def read_txt(f):
     f.seek(0); return f.read().decode("utf-8")
@@ -958,7 +970,11 @@ def process_file(f):
     ft = f.name.split(".")[-1].lower()
     file_tag(ft, t["file_detected"])
     if ft == "csv":
-        df = read_csv(f)
+        try:
+            df = read_csv(f)
+        except ValueError as e:
+            st.error(str(e))
+            return None
 
         # ── Aperçu collapsible ─────────────────────────────────────
         with st.expander(f"📋 {t['prev_csv']}", expanded=True):
